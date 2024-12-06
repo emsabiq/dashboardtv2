@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Landing Page with Looker Studio Report and Video</title>
+    <style>
+        /* Menata tampilan iframe agar mengisi seluruh layar */
+        .iframe-container {
+            width: 100%;
+            height: 100vh; /* Menggunakan tinggi layar penuh */
+            overflow: hidden; /* Menghilangkan scroll jika ada */
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+    <script>
+        // Flag untuk memastikan video hanya diputar sekali
+        let videoPlayed = false;
+
+        // Fungsi untuk memeriksa waktu dan membuka tab baru untuk video pada jam 10:00 pagi
+        function checkTimeAndPlayVideo() {
+            var currentDate = new Date();
+            var currentHour = currentDate.getHours();
+            var currentMinute = currentDate.getMinutes();
+
+            // Memeriksa apakah sekarang jam 10:00 pagi dan video belum diputar
+            if (currentHour === 9 && currentMinute === 22 && !videoPlayed) {
+                // Membuka tab baru untuk video
+                var videoUrl = '/indonesia-raya-video.mp4'; // Ganti dengan URL video yang sesuai
+                var newTab = window.open(videoUrl, '_blank'); // Membuka video di tab baru
+
+                // Pastikan video diputar otomatis di tab baru
+                newTab.onload = function() {
+                    var video = newTab.document.querySelector('video');
+                    video.play().catch(function(error) {
+                        console.error("Error playing video:", error);
+                    });
+
+                    // Menambahkan event listener untuk menutup tab setelah video selesai diputar
+                    video.onended = function() {
+                        // Menutup tab video setelah video selesai
+                        newTab.close();
+
+                        // Mengaktifkan fullscreen di tab utama (Looker Studio)
+                        enterFullscreen();
+
+                        // Mengarahkan pengguna kembali ke laporan Looker Studio jika perlu
+                        window.focus(); // Fokus kembali ke tab utama
+                    };
+                };
+
+                // Set flag menjadi true setelah video diputar
+                videoPlayed = true;
+            }
+        }
+
+        // Fungsi untuk memaksa mode fullscreen pada iframe Looker Studio
+        function enterFullscreen() {
+            var iframe = document.querySelector("iframe");
+
+            // Memasuki fullscreen jika memungkinkan
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.mozRequestFullScreen) { // Firefox
+                iframe.mozRequestFullScreen();
+            } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, Opera
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) { // IE/Edge
+                iframe.msRequestFullscreen();
+            }
+        }
+
+        // Memanggil fungsi setiap detik untuk memeriksa waktu
+        setInterval(checkTimeAndPlayVideo, 1000); // 1000 ms = 1 detik
+    </script>
+</head>
+<body>
+
+    <div class="iframe-container">
+        <!-- Embed Looker Studio Report tanpa judul -->
+        <iframe src="https://lookerstudio.google.com/embed/reporting/8f77b22f-5232-4bb7-a9e5-9db96a80b25a/page/bmVIE" frameborder="0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+    </div>
+
+</body>
+</html>
